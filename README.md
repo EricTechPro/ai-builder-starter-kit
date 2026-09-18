@@ -1,25 +1,32 @@
 # ai-builder-starter-kit
 
-A portable Claude Code setup to drop into a new AI-application project. It is configuration
-only — no framework, no dependencies, nothing to install.
+A portable, harness-agnostic agent setup to drop into a new AI-application project.
+Configuration only — no framework, no dependencies, nothing to install.
+
+`AGENTS.md` and `.agents/` are the source of truth. Claude Code gets a thin adapter;
+Codex needs no adapter at all. Swapping harness does not mean rewriting your project's
+instructions.
 
 ## Use it
 
 ```bash
-cp -R ai-builder-starter-kit/.claude your-project/.claude
-cp ai-builder-starter-kit/CLAUDE.md your-project/CLAUDE.md
+cp -R ai-builder-starter-kit/.agents  your-project/.agents
+cp -R ai-builder-starter-kit/.claude  your-project/.claude   # Claude Code adapter
+cp    ai-builder-starter-kit/AGENTS.md your-project/AGENTS.md
+cp    ai-builder-starter-kit/CLAUDE.md your-project/CLAUDE.md
 ```
 
-Then fill in `CLAUDE.md`. Every `<angle-bracket>` is a blank; delete the sections that do not
-apply. A short, true CLAUDE.md beats a long, aspirational one.
+Then fill in `AGENTS.md`. Every `<angle-bracket>` is a blank; delete the sections that do not
+apply. Never edit `CLAUDE.md` for project guidance — it only imports `AGENTS.md`.
 
-## What's in it
+Copy `.agents/` alone if you are not using Claude Code.
+
+## Layout
 
 ```
-CLAUDE.md                          Project-conventions template
-.claude/
-  settings.json                    Shared baseline: permissions + hooks
-  settings.local.json.example      Personal overrides (copy, don't commit)
+AGENTS.md                          Source of truth — instructions, any harness
+.agents/                           Source of truth — capabilities, any harness
+  skills/                          25 vendored skills + UPSTREAM.md provenance
   commands/
     verify.md                      /verify — run the check chain, report failures
     ship.md                        /ship   — verify, branch, commit, open PR
@@ -28,23 +35,40 @@ CLAUDE.md                          Project-conventions template
     prompt-reviewer.md             Reviews the app↔model seam
     cost-tracer.md                 Maps where tokens and latency go
   hooks/
-    guard-secrets.sh               PreToolUse(Bash): blocks shell access to secrets
-    session-context.sh             SessionStart: branch, scripts, package manager
-  skills/                          25 vendored skills + UPSTREAM.md provenance
+    guard-secrets.sh               Blocks shell access to secrets
+    session-context.sh             Branch, scripts, package manager
+CLAUDE.md                          Adapter → imports AGENTS.md
+.claude/
+  settings.json                    Permissions + hook wiring (Claude-only concepts)
+  settings.local.json.example      Personal overrides (copy, don't commit)
+  skills    -> ../.agents/skills   symlink
+  commands  -> ../.agents/commands symlink
+  agents    -> ../.agents/agents   symlink
 ```
+
+Nothing is duplicated. `.claude/` is three symlinks and one settings file.
 
 **commands vs agents vs skills** — commands are what *you* invoke by name (`/verify`).
 Agents are delegated fan-out work that returns a conclusion instead of a pile of file reads.
 Skills load themselves when the task matches their description, which is why the discipline
 you want applied *without remembering to ask for it* belongs in `skills/`.
 
+## Why `.agents/` and `AGENTS.md`, both plural
+
+Not a style choice — it is what the other harnesses actually look for. From Codex's source:
+skills are resolved from `.agents/skills` directories discovered between the project root and
+cwd, and project `AGENTS.md` files are concatenated walking root → cwd. Singular `.agent/` or
+`AGENT.md` would be found by nothing.
+
+So `.agents/skills/` is read **natively** by Codex — the adapter directory is only needed for
+Claude Code, which looks in `.claude/`.
+
 ## The two hooks
 
-**`guard-secrets.sh`** closes the door that permission rules leave open. `Read(.env)` deny
-rules stop the Read tool; they do nothing about `cat .env`, `source .env.local`, or
-`grep KEY .env | curl`. This hook inspects the shell command and denies those, while
-deliberately allowing `.env.example` — that file is how Claude is meant to learn which keys
-exist.
+**`guard-secrets.sh`** closes the door that permission rules leave open. Deny rules on the
+Read tool do nothing about `cat` in a shell. This hook inspects the shell command and denies
+those, while deliberately allowing the checked-in example env file — that file is how an agent
+is meant to learn which keys exist.
 
 It matches on the command text, so a command that merely *mentions* a secret filename is
 blocked too. That is the intended trade: the false positives are rare and loud, and the escape
@@ -53,7 +77,7 @@ hatch is to run the command yourself with the `!` prefix.
 Test it after any change:
 
 ```bash
-printf '{"tool_name":"Bash","tool_input":{"command":"cat .env"}}' | .claude/hooks/guard-secrets.sh
+printf '{"tool_name":"Bash","tool_input":{"command":"cat .env"}}' | .agents/hooks/guard-secrets.sh
 # → a permissionDecision: "deny" payload
 ```
 
@@ -61,12 +85,16 @@ printf '{"tool_name":"Bash","tool_input":{"command":"cat .env"}}' | .claude/hook
 session: current branch and dirty-file count, the `package.json` scripts, and which package
 manager the lockfile implies. Keep its output short — it is prepended to every session.
 
-Both hooks fail open if `jq` is missing, rather than blocking all work.
+Both scripts read JSON on stdin and write JSON on stdout, so they are not Claude-specific. Only
+the *wiring* in `.claude/settings.json` is; another harness points its own hook config at the
+same files.
+
+Both fail open if `jq` is missing, rather than blocking all work.
 
 ## Permissions
 
-`settings.json` allows read-only inspection (git status/diff/log, ripgrep, find) and the
-standard check commands, so ordinary work does not generate prompts. It denies secret reads
+`.claude/settings.json` allows read-only inspection (git status/diff/log, ripgrep, find) and
+the standard check commands, so ordinary work does not generate prompts. It denies secret reads
 and history-rewriting git commands outright, and asks before anything that leaves the machine
 — `git push`, `gh pr merge`, `npm publish`, `vercel`.
 
@@ -74,11 +102,11 @@ Adjust the allowlist to the project's real package manager. The defaults cover p
 
 ## Bundled skills
 
-`.claude/skills/` holds 25 skills vendored from
+`.agents/skills/` holds 25 skills vendored from
 [mattpocock/skills](https://github.com/mattpocock/skills) (MIT, v1.2.3) — TDD, code review,
 domain modelling, diagnosing bugs, spec and ticket flows, grilling a plan, writing docs for
 agents, and more. They are copied in, not installed as a plugin, so they travel with the repo
-and can be edited in place. `.claude/skills/UPSTREAM.md` records the version, the commit, and
+and can be edited in place. `.agents/skills/UPSTREAM.md` records the version, the commit, and
 how to pull updates without discarding local edits.
 
 Because they are copies, `settings.json` carries:
@@ -98,5 +126,8 @@ If you would rather subscribe than fork — automatic updates, read-only — fli
 
 - Hooks are picked up by the settings watcher only for directories that had a settings file
   when the session started. In a fresh copy, open `/hooks` once or restart Claude Code.
-- `settings.local.json` is gitignored by `.claude/.gitignore`. Keep real secrets in
-  `.env.local` — which the guard blocks — and list the key names in `.env.example`.
+- The `.claude/*` symlinks are relative and committed as symlinks. On Windows without developer
+  mode or `core.symlinks=true`, git checks them out as plain text files — replace them with
+  real copies or junctions there.
+- `settings.local.json` is gitignored by `.claude/.gitignore`. Keep real secrets in the local
+  dotenv file — which the guard blocks — and list the key names in the example env file.

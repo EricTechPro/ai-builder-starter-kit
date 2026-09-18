@@ -28,7 +28,7 @@ There is no automatic update. To pull upstream changes:
 ```bash
 git clone --depth 1 https://github.com/mattpocock/skills.git /tmp/mp-skills
 # review what changed against this directory before copying anything over
-diff -rq /tmp/mp-skills/skills/engineering/tdd .claude/skills/tdd
+diff -rq /tmp/mp-skills/skills/engineering/tdd .agents/skills/tdd
 ```
 
 Copy the directories you want and update the version and commit in the table above. Review
