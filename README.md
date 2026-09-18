@@ -143,6 +143,10 @@ which is what makes the project-scoped `false` stick.
 If you would rather subscribe than fork — automatic updates, read-only — flip that value to
 `true` and delete the vendored directories.
 
+## Bring it to a live call
+
+Found a bug, have a question, or want to suggest an improvement? [Open an issue](https://github.com/EricTechPro/ai-builder-starter-kit/issues). We’ll use the Issues page to choose what to work on together during every live call.
+
 ## Notes
 
 - Hooks are picked up by the settings watcher only for directories that had a settings file
