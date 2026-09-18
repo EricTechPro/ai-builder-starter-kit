@@ -66,6 +66,26 @@ and history-rewriting git commands outright, and asks before anything that leave
 
 Adjust the allowlist to the project's real package manager. The defaults cover pnpm and npm.
 
+## Bundled skills
+
+`.claude/settings.json` declares one plugin dependency:
+
+```json
+"enabledPlugins": { "mattpocock-skills@claude-plugins-official": true }
+```
+
+[mattpocock/skills](https://github.com/mattpocock/skills) — engineering skills covering TDD,
+code review, domain modelling, diagnosing bugs, spec and ticket flows, grilling a plan, and
+writing docs for agents. Anyone who clones this kit gets them; it resolves from Claude Code's
+official marketplace, so there is no marketplace to add first.
+
+It is declared, not vendored. The upstream README warns that installing the plugin *and*
+copying the skill files leaves you with every skill twice — so the kit takes the plugin route,
+which also means updates arrive from upstream instead of freezing at today's copy.
+
+To hack on the skills rather than subscribe to them, drop the `enabledPlugins` entry and run
+`npx skills@latest add mattpocock/skills` instead, which copies editable files into the project.
+
 ## Notes
 
 - Hooks are picked up by the settings watcher only for directories that had a settings file
