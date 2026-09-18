@@ -1,0 +1,16 @@
+# Skills exempt from the Stop-time eval gate in .agents/hooks/gate-skill-evals.sh.
+# One shell glob per line, matched against the skill's directory name. Blank lines
+# and lines starting with # are ignored.
+#
+# Put a skill here when you did not author it: anything vendored from upstream or
+# dropped in by an installer. Gating your own work on a third-party skill's eval
+# coverage is noise, and noise is how a gate ends up switched off entirely.
+#
+# Skills you wrote should NOT be here. Write the eval instead.
+
+# Installed by the graphify tool, not authored in this repo.
+graphify
+
+# Vendored upstream; see .agents/skills/UPSTREAM.md.
+ask-matt
+setup-matt-pocock-skills

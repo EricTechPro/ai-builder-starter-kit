@@ -98,3 +98,24 @@ Real keys live in the local dotenv file, which `.agents/hooks/guard-secrets.sh` 
 shell access. Key *names* are listed in the checked-in example env file — read that instead.
 If a command genuinely needs a secret, ask the user to run it themselves rather than reading
 the file.
+
+## graphify
+
+This project has a knowledge graph at `graphify-out/` with god nodes, community structure, and
+cross-file relationships. graphify is installed into this repo's own venv (`.graphify/`), not
+globally — always reach it through the `.agents/bin/graphify` shim so you get this repo's pinned
+version rather than whatever happens to be on `PATH`.
+
+Rules:
+- For codebase questions, first run `.agents/bin/graphify query "<question>"` when
+  `graphify-out/graph.json` exists. Use `.agents/bin/graphify path "<A>" "<B>"` for relationships
+  and `.agents/bin/graphify explain "<concept>"` for focused concepts. These return a scoped
+  subgraph, usually much smaller than `GRAPH_REPORT.md` or raw grep output.
+- If `graphify-out/wiki/index.md` exists, use it for broad navigation instead of raw source browsing.
+- Read `graphify-out/GRAPH_REPORT.md` only for broad architecture review, or when query/path/explain
+  do not surface enough context.
+- After modifying code, run `.agents/bin/graphify update .` to keep the graph current (AST-only, no
+  API cost).
+- `graphify-out/` and `.graphify/` are build artefacts and are gitignored. Recreate the venv after a
+  fresh clone with:
+  `uv venv .graphify --python 3.12 && uv pip install --python .graphify/bin/python graphifyy`
