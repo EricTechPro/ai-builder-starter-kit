@@ -5,6 +5,13 @@ My Claude Code + Codex setup, with curated skills and templates for building pro
 ## What’s inside
 
 - **Skills** — evaluated for practical use across models.
+
+| Skill Family | # Skills | Description Short Brief (max 15 words) |
+|---|---:|---|
+| [Matt Pocock’s Skills](https://github.com/mattpocock/skills) | 25 | Planning, development, testing, debugging, architecture, research, and code review. |
+| Eric Tech’s Skills | 1 | Custom skills created and curated by Eric Tech. |
+| [Graphify](https://github.com/Graphify-Labs/graphify) | 1 | Build and query knowledge graphs of code, documentation, and project content. |
+
 - **Development** — build, test, debug, and ship.
 - **Research** — find sources and turn findings into decisions.
 - **Second brain** — organize knowledge and project context.
