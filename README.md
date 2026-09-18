@@ -30,7 +30,13 @@ CLAUDE.md                          Project-conventions template
   hooks/
     guard-secrets.sh               PreToolUse(Bash): blocks shell access to secrets
     session-context.sh             SessionStart: branch, scripts, package manager
+  skills/                          25 vendored skills + UPSTREAM.md provenance
 ```
+
+**commands vs agents vs skills** — commands are what *you* invoke by name (`/verify`).
+Agents are delegated fan-out work that returns a conclusion instead of a pile of file reads.
+Skills load themselves when the task matches their description, which is why the discipline
+you want applied *without remembering to ask for it* belongs in `skills/`.
 
 ## The two hooks
 
@@ -68,23 +74,25 @@ Adjust the allowlist to the project's real package manager. The defaults cover p
 
 ## Bundled skills
 
-`.claude/settings.json` declares one plugin dependency:
+`.claude/skills/` holds 25 skills vendored from
+[mattpocock/skills](https://github.com/mattpocock/skills) (MIT, v1.2.3) — TDD, code review,
+domain modelling, diagnosing bugs, spec and ticket flows, grilling a plan, writing docs for
+agents, and more. They are copied in, not installed as a plugin, so they travel with the repo
+and can be edited in place. `.claude/skills/UPSTREAM.md` records the version, the commit, and
+how to pull updates without discarding local edits.
+
+Because they are copies, `settings.json` carries:
 
 ```json
-"enabledPlugins": { "mattpocock-skills@claude-plugins-official": true }
+"enabledPlugins": { "mattpocock-skills@claude-plugins-official": false }
 ```
 
-[mattpocock/skills](https://github.com/mattpocock/skills) — engineering skills covering TDD,
-code review, domain modelling, diagnosing bugs, spec and ticket flows, grilling a plan, and
-writing docs for agents. Anyone who clones this kit gets them; it resolves from Claude Code's
-official marketplace, so there is no marketplace to add first.
+That switches off the marketplace plugin **for this project only**, so the skills do not load
+twice. A global install stays active everywhere else. Project settings override user settings,
+which is what makes the project-scoped `false` stick.
 
-It is declared, not vendored. The upstream README warns that installing the plugin *and*
-copying the skill files leaves you with every skill twice — so the kit takes the plugin route,
-which also means updates arrive from upstream instead of freezing at today's copy.
-
-To hack on the skills rather than subscribe to them, drop the `enabledPlugins` entry and run
-`npx skills@latest add mattpocock/skills` instead, which copies editable files into the project.
+If you would rather subscribe than fork — automatic updates, read-only — flip that value to
+`true` and delete the vendored directories.
 
 ## Notes
 
