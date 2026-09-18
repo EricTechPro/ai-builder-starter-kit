@@ -1,11 +1,15 @@
-# ai-builder-starter-kit
+# AI Builder Starter Kit
 
-A portable, harness-agnostic agent setup to drop into a new AI-application project.
-Configuration only — no framework, no dependencies, nothing to install.
+My Claude Code + Codex setup, with curated skills and a reusable project template for building AI products.
 
-`AGENTS.md` and `.agents/` are the source of truth. Claude Code gets a thin adapter;
-Codex needs no adapter at all. Swapping harness does not mean rewriting your project's
-instructions.
+## What's inside
+
+- **Skills** — 25 bundled skills for planning, development, debugging, code review, and documentation.
+- **Project template** — shared instructions in `AGENTS.md` and capabilities in `.agents/`.
+- **Workflows** — commands to verify changes, ship work, and evaluate prompts.
+- **Claude Code setup** — adapters, permissions, and hooks that connect to the shared configuration.
+
+Clone the repo, copy the setup into your project, and make it your own. No framework or package dependencies to install; the hooks use `jq`.
 
 ## Use it
 
