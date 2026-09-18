@@ -15,8 +15,11 @@ If the import above did not pull it in, read `AGENTS.md` now before doing anythi
 Everything below is true only of this harness; it is deliberately absent from `AGENTS.md`.
 
 - `.claude/skills`, `.claude/commands` and `.claude/agents` are **symlinks** into `.agents/`.
-  Edit the real files under `.agents/` — editing through the link works, but reach for the
-  real path so the source of truth stays obvious.
+  Install and edit under `.agents/` — going through the link works (it resolves to the same
+  files) but reach for the real path so the source of truth stays obvious.
+- **Never replace one of those symlinks with a real directory.** If a skill installer wants to
+  create `.claude/skills/`, point it at `.agents/skills/` instead, or move the result there and
+  restore the link. The SessionStart hook warns when one of them has become a real directory.
 - `.claude/settings.json` holds what only Claude Code understands: the permission allow/deny/ask
   rules and the hook wiring. The hook *scripts* themselves live in `.agents/hooks/` and read
   JSON on stdin, so another harness can call them too.

@@ -24,6 +24,24 @@ fi
 
 [ -f .env.example ] && out="${out}Key names are in .env.example; .env* itself is blocked by the secrets guard."$'\n'
 
+# Drift check: .claude/{skills,commands,agents} must stay symlinks into .agents/.
+# An installer that does `rm -rf` then `mkdir` replaces one with a real directory,
+# which forks the source of truth silently. Make that loud instead.
+drifted=""
+for link in skills commands agents; do
+  path=".claude/$link"
+  [ -e "$path" ] || continue
+  if [ ! -L "$path" ]; then
+    drifted="${drifted} ${path}"
+  fi
+done
+
+if [ -n "$drifted" ]; then
+  out="${out}WARNING - these should be symlinks into .agents/ but are now real directories:${drifted}."$'\n'
+  out="${out}The source of truth has forked. Move the contents into the matching .agents/ directory, "
+  out="${out}delete the real directory, and recreate the link: ln -s ../.agents/<name> .claude/<name>"$'\n'
+fi
+
 [ -z "$out" ] && exit 0
 
 if command -v jq > /dev/null 2>&1; then

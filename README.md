@@ -48,6 +48,23 @@ CLAUDE.md                          Adapter → imports AGENTS.md
 
 Nothing is duplicated. `.claude/` is three symlinks and one settings file.
 
+### Installing new skills
+
+Put them in `.agents/skills/`. Writing to `.claude/skills/` also works — it is a symlink, so
+the files land in `.agents/skills/` regardless — but the real path keeps the source of truth
+obvious.
+
+The one way this forks silently is an installer that does `rm -rf .claude/skills` then `mkdir`,
+turning the link into a real directory: two copies, edits landing in whichever one you opened.
+`session-context.sh` checks all three links at session start and warns with the exact path and
+fix if it happens. To repair it by hand:
+
+```bash
+mv .claude/skills/* .agents/skills/ 2>/dev/null
+rm -rf .claude/skills
+ln -s ../.agents/skills .claude/skills
+```
+
 **commands vs agents vs skills** — commands are what *you* invoke by name (`/verify`).
 Agents are delegated fan-out work that returns a conclusion instead of a pile of file reads.
 Skills load themselves when the task matches their description, which is why the discipline
