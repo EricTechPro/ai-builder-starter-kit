@@ -1,0 +1,37 @@
+schema_version: "1.1"
+name: near-miss-phone-feature
+description: >
+  The word "phone" appears, but as the subject of the work, not as where the user is.
+  A skill that fires on its own keyword instead of on intent is worse than no skill:
+  it reformats every reply the moment the domain happens to involve phones.
+tags: [triggering, near-miss]
+runs: 2
+plugins: ["../.."]
+
+execution:
+  prompt: |
+    add phone number validation to the signup form, and explain the approach you took
+  max_turns: 20
+  allowed_tools: [Read, Glob, Grep, Skill]
+
+graders:
+  - name: skill-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: phone-mode
+    min: 0
+    max: 0
+    arm: both
+    weight: 3
+
+  - name: normal-length-answer
+    type: llm
+    focus: last_message
+    weight: 2
+    criteria: |
+      PASS if the reply is a normal desktop answer: it explains the approach in full
+      prose or ordinary markdown, and is not compressed into a phone card.
+
+      FAIL if the reply is formatted as a phone card, meaning emoji section headers,
+      a hard 15-line ceiling, or a trailing 👉 with a single decision. The user asked
+      for an explanation while at their desk and should get one.

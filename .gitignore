@@ -21,3 +21,12 @@ coverage/
 # OS noise
 .DS_Store
 Thumbs.db
+
+# graphify — repo-local venv and generated knowledge graph. Recreate the venv with:
+#   uv venv .graphify --python 3.12 && uv pip install --python .graphify/bin/python graphifyy
+.graphify/
+graphify-out/
+.claude/settings.json.graphify-bak
+
+# claude plugin eval writes run output here
+.agents/skills/*/evals/results/
