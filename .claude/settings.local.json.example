@@ -1,0 +1,35 @@
+{
+  "_comment": [
+    "Copy to settings.local.json for personal, machine-specific overrides.",
+    "settings.local.json is gitignored; settings.json is the shared, committed baseline.",
+    "Precedence: user (~/.claude) < project (settings.json) < local (this file).",
+    "Delete this _comment key in your real file — it is only here as documentation."
+  ],
+
+  "env": {
+    "_comment": "Non-secret, machine-specific values only. Real keys belong in .env.local, which the secrets guard blocks from being read.",
+    "EXAMPLE_LOCAL_API_BASE": "http://localhost:8787"
+  },
+
+  "permissions": {
+    "_comment": "Additions here merge with settings.json rather than replacing it.",
+    "allow": [
+      "Bash(docker compose*)"
+    ]
+  },
+
+  "hooks": {
+    "_comment": "Optional: auto-format after every write. Swap prettier for this project's formatter, and delete this block if the project has none.",
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "jq -r '.tool_response.filePath // .tool_input.file_path' | { read -r f; npx --no-install prettier --ignore-unknown --write \"$f\"; } 2>/dev/null || true"
+          }
+        ]
+      }
+    ]
+  }
+}

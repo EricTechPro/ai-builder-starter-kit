@@ -1,0 +1,5 @@
+# Personal, machine-specific overrides — never committed.
+settings.local.json
+
+# Claude Code working directories, if they land here.
+worktrees/
