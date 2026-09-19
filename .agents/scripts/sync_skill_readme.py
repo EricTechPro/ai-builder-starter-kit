@@ -14,7 +14,7 @@ START = '<!-- skills:start -->'
 END = '<!-- skills:end -->'
 CONFIG = '.agents/skills/families.json'
 PROVENANCE = '.agents/skills/UPSTREAM.md'
-EVALS = '.agents/skills/EVALS.md'
+EVALS = '.agents/evals'
 
 
 def git(root, *args):
@@ -36,14 +36,16 @@ def inventory(root, staged=False):
 
 
 def verdict(family):
-    """Eval cell for a family: a link into EVALS.md, or an explicit blank."""
+    """Eval cell for a family: a link to its write-up in .agents/evals, or an
+    explicit em dash. A blank would read as a passing grade rather than as the
+    absence of a measurement."""
     entry = family.get('eval')
     if not entry:
         return '—'
-    anchor = cell(entry['anchor'])
-    if not re.fullmatch(r'[a-z0-9-]+', anchor):
-        raise ValueError('Family eval anchors must be lowercase-hyphen slugs: ' + anchor)
-    return '[' + cell(entry['verdict']) + '](' + EVALS + '#' + anchor + ')'
+    page = cell(entry['page'])
+    if not re.fullmatch(r'[a-z0-9-]+', page):
+        raise ValueError('Family eval pages must be lowercase-hyphen slugs: ' + page)
+    return '[' + cell(entry['verdict']) + '](' + EVALS + '/' + page + '.md)'
 
 
 def cell(value):

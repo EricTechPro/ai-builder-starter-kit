@@ -182,9 +182,9 @@ class EvalColumnTests(unittest.TestCase):
     def test_family_with_an_eval_links_into_the_ledger(self):
         self.families('{"families": [{"name": "Demo", "description": "d",'
                       ' "skills": ["demo"],'
-                      ' "eval": {"verdict": "Kept, +0.40", "anchor": "demo-vs-other"}}]}')
+                      ' "eval": {"verdict": "Kept, +0.40", "page": "demo-vs-other"}}]}')
         self.module.sync(self.root)
-        self.assertIn('[Kept, +0.40](.agents/skills/EVALS.md#demo-vs-other)',
+        self.assertIn('[Kept, +0.40](.agents/evals/demo-vs-other.md)',
                       (self.root / 'README.md').read_text())
 
     def test_family_without_an_eval_says_so(self):
@@ -192,15 +192,15 @@ class EvalColumnTests(unittest.TestCase):
         self.module.sync(self.root)
         self.assertIn('| Demo | 1 | d | \u2014 |', (self.root / 'README.md').read_text())
 
-    def test_anchor_must_be_a_slug(self):
+    def test_page_must_be_a_slug(self):
         self.families('{"families": [{"name": "Demo", "description": "d", "skills": ["demo"],'
-                      ' "eval": {"verdict": "Kept", "anchor": "Not A Slug"}}]}')
+                      ' "eval": {"verdict": "Kept", "page": "Not A Slug"}}]}')
         with self.assertRaises(ValueError):
             self.module.sync(self.root)
         self.assertIn('old', (self.root / 'README.md').read_text())
 
     def test_skill_count_survives_the_extra_column(self):
         self.families('{"families": [{"name": "Demo", "description": "d", "skills": ["demo"],'
-                      ' "eval": {"verdict": "Kept", "anchor": "demo"}}]}')
+                      ' "eval": {"verdict": "Kept", "page": "demo"}}]}')
         self.module.sync(self.root)
         self.assertIn('**1 skills,**', (self.root / 'README.md').read_text())

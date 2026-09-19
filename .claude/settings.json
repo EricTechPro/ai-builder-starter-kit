@@ -133,6 +133,11 @@
         "hooks": [
           {
             "type": "command",
+            "command": "\"${CLAUDE_PROJECT_DIR:-.}/.agents/hooks/sync-eval-index.sh\"",
+            "timeout": 15
+          },
+          {
+            "type": "command",
             "command": "\"${CLAUDE_PROJECT_DIR:-.}/.agents/hooks/gate-skill-evals.sh\"",
             "timeout": 15
           },

@@ -33,7 +33,7 @@
       ],
       "eval": {
         "verdict": "Kept over obra/superpowers",
-        "anchor": "diagnosing-bugs-vs-systematic-debugging"
+        "page": "diagnosing-bugs"
       }
     },
     {
@@ -46,7 +46,7 @@
       ],
       "eval": {
         "verdict": "Kept, over-fires",
-        "anchor": "phone-mode"
+        "page": "phone-mode"
       }
     },
     {
@@ -66,7 +66,7 @@
       ],
       "eval": {
         "verdict": "0.30, undecided",
-        "anchor": "archify"
+        "page": "archify"
       }
     },
     {
@@ -94,7 +94,7 @@
       ],
       "eval": {
         "verdict": "Kept, +0.40 on safety",
-        "anchor": "caveman"
+        "page": "caveman"
       }
     }
   ]

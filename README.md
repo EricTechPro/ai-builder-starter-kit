@@ -26,11 +26,11 @@ Claude Code reads `.claude/` (three symlinks into `.agents/`). Codex reads `.age
 <!-- skills:start -->
 | Skill Family | # Skills | Description Short Brief (max 15 words) | Eval |
 |---|---:|---|---|
-| [Matt Pocock’s Skills](https://github.com/mattpocock/skills) | 25 | Planning, development, testing, debugging, architecture, research, and code review. | [Kept over obra/superpowers](.agents/skills/EVALS.md#diagnosing-bugs-vs-systematic-debugging) |
-| Eric Tech’s Skills | 1 | Custom skills created and curated by Eric Tech. | [Kept, over-fires](.agents/skills/EVALS.md#phone-mode) |
+| [Matt Pocock’s Skills](https://github.com/mattpocock/skills) | 25 | Planning, development, testing, debugging, architecture, research, and code review. | [Kept over obra/superpowers](.agents/evals/diagnosing-bugs.md) |
+| Eric Tech’s Skills | 1 | Custom skills created and curated by Eric Tech. | [Kept, over-fires](.agents/evals/phone-mode.md) |
 | [Graphify](https://github.com/Graphify-Labs/graphify) | 1 | Build and query knowledge graphs of code, documentation, and project content. | — |
-| [Archify](https://github.com/tt-a1i/archify) | 1 | Validated architecture, workflow, sequence, data-flow, and lifecycle diagrams as standalone HTML. | [0.30, undecided](.agents/skills/EVALS.md#archify) |
-| [juliusbrussee/caveman](https://github.com/juliusbrussee/caveman) | 1 | Token compression with an auto-clarity layer that suspends it for irreversible steps. | [Kept, +0.40 on safety](.agents/skills/EVALS.md#caveman) |
+| [Archify](https://github.com/tt-a1i/archify) | 1 | Validated architecture, workflow, sequence, data-flow, and lifecycle diagrams as standalone HTML. | [0.30, undecided](.agents/evals/archify.md) |
+| [juliusbrussee/caveman](https://github.com/juliusbrussee/caveman) | 1 | Token compression with an auto-clarity layer that suspends it for irreversible steps. | [Kept, +0.40 on safety](.agents/evals/caveman.md) |
 <!-- skills:end -->
 
 Vendored as copies, not plugins — they travel with the repo and you can edit them.

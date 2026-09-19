@@ -18,7 +18,7 @@ AGENTS.md          This file. The instructions, for every harness.
   commands/        Named workflows you invoke explicitly.
   agents/          Subagent definitions for delegated work.
   hooks/           Executable guards; the harness decides when to run them.
-  skills/EVALS.md  Eval results and the decision each one drove. Raw runs are gitignored.
+  evals/           One page per eval: what ran, on which model, what was decided.
   plugins/         Vendored Claude Code plugins, wired up in .claude/settings.json.
 CLAUDE.md          Claude Code adapter → imports AGENTS.md.
 .claude/           Claude Code adapter → symlinks into .agents/, plus settings.json.
@@ -33,11 +33,19 @@ and resolves to `.agents/skills/foo`, but write to the real path so the source o
 obvious to the next reader.
 
 A new skill also needs an eval under its `evals/`. The existing eval gate enforces this.
-Once it has been run, record the numbers and the decision in `.agents/skills/EVALS.md` and
-give the family an `"eval"` entry in `families.json` so the README's Eval column links to
-it. Raw results are gitignored because a single HTML report runs to 1.4 MB, so `EVALS.md`
-is the only durable record of why a skill is here. A family with no measurement renders as
-an em dash, which is the true answer; do not invent a verdict to fill it.
+Once it has been run, write `.agents/evals/<skill>.md`: front matter with `skill`, `title`,
+`run`, `date`, `model`, `cases`, `score`, `delta`, `cost_usd` and `verdict`, then a table of
+what each case tested and what it returned. Give the family an `"eval"` entry in
+`families.json` so the README's Eval column links to the page. Raw results are gitignored
+(one HTML report runs to 1.4 MB), so those pages are the only durable record of why a skill
+is here, and the index is generated from their front matter rather than from the results
+directory so it survives a fresh clone.
+
+`sync-eval-index.sh` runs at Stop and folds any finished run into the matching page's front
+matter, then names the pages whose tables and verdict now need a person. It never writes
+prose: a score is not a decision. Record the model every time, because a number without one
+is not reproducible. A family with no measurement renders as an em dash, which is the true
+answer; do not invent a verdict to fill it.
 The README skill-family table and skill counts are generated. After changing skills or
 provenance, run `python3 .agents/scripts/sync_skill_readme.py`. Counts come from installed
 `SKILL.md` files; family attribution comes from `UPSTREAM.md` and
