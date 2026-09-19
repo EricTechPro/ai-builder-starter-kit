@@ -65,7 +65,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "\"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/guard-secrets.sh\"",
+            "command": "\"${CLAUDE_PROJECT_DIR:-.}/.agents/hooks/guard-secrets.sh\"",
             "timeout": 10
           }
         ]
@@ -76,11 +76,14 @@
         "hooks": [
           {
             "type": "command",
-            "command": "\"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/session-context.sh\"",
+            "command": "\"${CLAUDE_PROJECT_DIR:-.}/.agents/hooks/session-context.sh\"",
             "timeout": 15
           }
         ]
       }
     ]
+  },
+  "enabledPlugins": {
+    "mattpocock-skills@claude-plugins-official": false
   }
 }

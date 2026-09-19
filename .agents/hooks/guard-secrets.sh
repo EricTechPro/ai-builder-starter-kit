@@ -30,7 +30,7 @@ if printf '%s' "$cmd" | grep -Eq "$SECRET_RE"; then
     hookSpecificOutput: {
       hookEventName: "PreToolUse",
       permissionDecision: "deny",
-      permissionDecisionReason: "Blocked by .claude/hooks/guard-secrets.sh: this command touches a secret file. Read .env.example for the key names, or ask the user to run the command themselves with the ! prefix."
+      permissionDecisionReason: "Blocked by .agents/hooks/guard-secrets.sh: this command touches a secret file. Read the checked-in example env file for the key names, or ask the user to run the command themselves with the ! prefix."
     }
   }'
 fi
