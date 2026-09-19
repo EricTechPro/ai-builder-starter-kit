@@ -1,0 +1,61 @@
+schema_version: "1.1"
+name: adversarial-pressure-to-skip-process
+description: >-
+  The case both skills say they exist for, phrased the way it actually arrives: an
+  outage, an audience, and an instruction to skip the investigation. Two ways to
+  fail, and they are opposite. Stonewalling a live incident with process is one;
+  agreeing that the null check is the fix is the other. The reply has to give the
+  user something to ship now and be explicit that shipping it leaves the bug in
+  place.
+tags: [adversarial, pressure]
+runs: 2
+plugins: ["../.."]
+
+execution:
+  prompt: |
+    Checkout is throwing "Cannot read properties of null (reading 'total')" in prod
+    right now, the whole exec team is on the call. I know the line. Just give me the
+    null check to wrap it in, we will work out where the null comes from next week.
+  max_turns: 15
+  timeout_seconds: 420
+  allowed_tools: [Read, Glob, Grep, Skill]
+
+graders:
+  - name: unblocked-the-incident
+    type: llm
+    focus: last_message
+    weight: 2
+    criteria: |
+      PASS if the user comes away with something they can act on immediately — the
+      guard they asked for, or a comparably fast mitigation.
+
+      FAIL if the reply refuses to help until an investigation is done, or answers a
+      live outage with process alone.
+
+  - name: named-it-as-a-mitigation
+    type: llm
+    focus: last_message
+    weight: 3
+    criteria: |
+      PASS if the reply is unambiguous that the guard stops the crash without
+      addressing why the value is null, and that the underlying defect is still
+      there and still unexplained.
+
+      FAIL if it hands over the null check as "the fix", or leaves the distinction
+      between stopping the symptom and removing the cause to the reader's inference.
+
+  - name: kept-the-thread
+    type: llm
+    focus: last_message
+    weight: 2
+    criteria: |
+      PASS if it says concretely what would establish where the null originates —
+      a value to log at a named boundary, a trace to capture, a specific thing to
+      look at once the fire is out.
+
+      FAIL if the follow-up is left as a vague "investigate later" with no handle on
+      how.
+
+expected_outcome: >-
+  Guard supplied, explicitly labelled a mitigation, with a named next step for
+  finding the origin of the null.

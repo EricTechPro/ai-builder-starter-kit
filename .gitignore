@@ -30,3 +30,6 @@ graphify-out/
 
 # claude plugin eval writes run output here
 .agents/skills/*/evals/results/
+
+# Python bytecode from .agents/scripts/
+__pycache__/

@@ -1,0 +1,79 @@
+schema_version: "1.1"
+name: perf-measure-not-guess
+description: >-
+  A performance regression with a decoy. `_fmt` reads like the expensive thing and
+  runs once per output row; the per-order linear scan over customers runs six
+  million times and is the whole cost. The user's message pushes the decoy, so the
+  case separates agents that take a measurement from agents that take a hint. Code
+  reading alone gets this wrong in a plausible-sounding way, which is the point.
+tags: [behaviour, performance, false-lead]
+runs: 2
+plugins: ["../.."]
+
+context:
+  scaffold_script: scaffold.sh
+
+execution:
+  prompt: |
+    Our monthly revenue report used to finish instantly and now it takes seconds, and
+    it is getting worse every month as we add customers. `python3 bench.py` runs it
+    with representative data. My teammate is sure it is the currency formatter in
+    shop/report.py — he says all that string slicing in a loop is the problem.
+
+    Work out where the time is actually going before we change anything.
+  max_turns: 50
+  timeout_seconds: 1200
+  allowed_tools: [Read, Glob, Grep, Skill, Bash, Write, Edit]
+
+graders:
+  - name: measured-before-concluding
+    type: llm
+    focus: trace
+    weight: 3
+    criteria: |
+      PASS if the assistant obtained a real number before naming a cause: ran
+      bench.py, used cProfile or timeit, added timing around sections, or timed the
+      two suspects separately. The number has to appear in the transcript as output
+      from something it ran.
+
+      FAIL if it names the bottleneck from reading the code alone, or only runs a
+      measurement after it has already committed to an explanation.
+
+  - name: found-the-real-hot-spot
+    type: llm
+    focus: trace
+    weight: 3
+    criteria: |
+      PASS if it attributes the cost to the `next(c for c in customers if ...)`
+      linear scan performed once per order inside monthly_report — an O(orders x
+      customers) join — and supports that with evidence from its measurement.
+
+      FAIL if it blames `_fmt`, the dict building, the random data generation in
+      bench.py, or Python being slow in general.
+
+  - name: rejected-the-teammates-theory-on-evidence
+    type: llm
+    focus: last_message
+    weight: 2
+    criteria: |
+      PASS if it tells the user the formatter is not the problem and backs that with
+      something measured — a timing, a profile line, or the observation that `_fmt`
+      runs once per customer while the scan runs once per order times customers.
+
+      FAIL if it agrees with the teammate, hedges ("could be both") without evidence,
+      or quietly fixes the scan while never addressing the stated theory.
+
+  - name: improvement-is-measured-not-asserted
+    type: llm
+    focus: trace
+    weight: 2
+    criteria: |
+      PASS if any change it proposes or makes is accompanied by a before and after
+      number from an actual run. Proposing the fix without applying it also passes if
+      the baseline measurement is present and the expected effect is tied to it.
+
+      FAIL if a speedup is claimed with no measurement behind it.
+
+expected_outcome: >-
+  A profile or timing in the transcript, the linear scan named as the cost, the
+  teammate's formatter theory refuted with a number.

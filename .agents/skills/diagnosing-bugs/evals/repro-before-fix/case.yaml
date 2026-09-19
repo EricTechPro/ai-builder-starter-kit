@@ -1,0 +1,123 @@
+schema_version: "1.1"
+name: repro-before-fix
+description: >-
+  The whole discipline in one run, with real tools and a real bug. The committed
+  suite is green and a VIP lookup in isolation is correct, so the only way to see
+  the failure is to build a sequence that provokes it. An agent that reads the
+  code and announces a cause can still get lucky here; one that runs something
+  first cannot get it wrong. Graded on evidence, not on eloquence.
+tags: [behaviour, root-cause, regression-test]
+runs: 2
+plugins: ["../.."]
+
+context:
+  scaffold_script: scaffold.sh
+
+execution:
+  prompt: |
+    Support has three tickets this week saying VIP customers were charged the
+    standard discount instead of the VIP one. Finance confirmed the money is wrong,
+    not the invoice template. It is not every VIP order, and I could not make it
+    happen when I tried a VIP checkout by hand.
+
+    The project is in the current directory. `./run_tests.sh` runs the suite.
+    Find out what is actually going on and fix it.
+  max_turns: 60
+  timeout_seconds: 1500
+  allowed_tools: [Read, Glob, Grep, Skill, Bash, Write, Edit]
+
+graders:
+  - name: ran-something-before-diagnosing
+    type: llm
+    focus: trace
+    weight: 3
+    criteria: |
+      PASS if, before it commits to an explanation of the cause, the assistant
+      executed something and read the output: a script, a test, a REPL snippet,
+      anything that exercises the pricing path. Reading the source first is fine;
+      what matters is that a claim about the cause is backed by an observation it
+      made, not only by reasoning about the code.
+
+      FAIL if it announces the root cause having run nothing, or having only run
+      the existing test suite (which is green and therefore tells it nothing about
+      this bug).
+
+  - name: made-the-bug-visible
+    type: llm
+    focus: trace
+    weight: 3
+    criteria: |
+      PASS if at some point the assistant produced an actual observed failure that
+      matches the reported symptom: a VIP customer receiving the standard discount
+      rate. Concretely, it ran something that resolved or priced a code at the
+      standard tier and then at the vip tier and saw the vip result come back
+      wrong (for SAVE10: 0.10 / 2250 rather than 0.20 / 2000). The observation must
+      appear in the transcript as command output, not as a prediction.
+
+      FAIL if no such failing observation was ever produced, or if the only
+      "reproduction" is the assistant asserting in prose that this is what would
+      happen.
+
+  - name: root-cause-is-the-cache-key
+    type: llm
+    focus: trace
+    weight: 3
+    criteria: |
+      PASS if the assistant identifies that `_cache` in shop/discounts.py is keyed
+      on the code alone while `_RATES` is keyed on (code, tier), so the first
+      lookup for a code freezes that code's rate at whichever tier asked first.
+
+      FAIL if it blames something else: rounding, the pricing arithmetic, the test
+      data, the caller, "a race condition" with no mechanism, or if it stops at the
+      surface description "VIP gets the wrong rate" without naming the cache key.
+
+  - name: fix-addresses-the-key-not-the-symptom
+    type: llm
+    focus: trace
+    weight: 2
+    criteria: |
+      PASS if the change makes tier part of the cache identity (keying on
+      (code, tier), nesting by tier, or removing the cache), so that the two tiers
+      can no longer collide.
+
+      FAIL if the fix special-cases VIP, calls clear_cache() from the caller or
+      between requests to paper over the collision, hard-codes the expected rates,
+      or edits the tests to match the wrong behaviour.
+
+  - name: verified-after-fixing
+    type: llm
+    focus: trace
+    weight: 2
+    criteria: |
+      PASS if after applying the fix the assistant re-ran both the thing that
+      showed the bug (now passing) and the pre-existing suite (still passing), and
+      the output of those runs is in the transcript.
+
+      FAIL if it declares the bug fixed without re-running anything, or re-runs only
+      its own new check and never confirms it broke nothing else.
+
+  - name: locked-down-with-a-test
+    type: llm
+    focus: trace
+    weight: 2
+    criteria: |
+      PASS if the run leaves behind an automated regression test that fails on the
+      old code and passes on the new — one that exercises the two-tier sequence, not
+      a single VIP lookup, since a single lookup passes either way. Explicitly and
+      correctly arguing that no sound seam exists for such a test also passes, so
+      long as the argument names why.
+
+      FAIL if no test was added and no reasoned case was made for its absence, or if
+      the test added would pass against the unfixed code.
+
+  - name: no-debug-leftovers
+    type: regex
+    target: files
+    pattern: "(pdb\\.set_trace|breakpoint\\(\\)|print\\(\\s*[\"']?(DEBUG|XXX|HERE|TEMP))"
+    match: not_contains
+    weight: 1
+
+expected_outcome: >-
+  A failing observation exists in the transcript before any claim about the cause;
+  the cause named is the cache key in shop/discounts.py; the fix widens the key; the
+  suite and the repro are both re-run afterwards.

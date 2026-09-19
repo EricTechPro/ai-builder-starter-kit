@@ -56,6 +56,22 @@
       "skills": [
         "archify"
       ]
+    },
+    {
+      "name": "agent-browser",
+      "source": "https://github.com/vercel-labs/agent-browser",
+      "description": "Drive a real browser from the shell: navigate, snapshot, click, screenshot. Needs the CLI installed.",
+      "skills": [
+        "agent-browser"
+      ]
+    },
+    {
+      "name": "Playwright Best Practices",
+      "source": "https://github.com/currents-dev/playwright-best-practices-skill",
+      "description": "Writing, debugging and shipping Playwright suites: page objects, fixtures, waiting, mocking, CI.",
+      "skills": [
+        "playwright-best-practices"
+      ]
     }
   ]
 }
