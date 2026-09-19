@@ -18,6 +18,7 @@ AGENTS.md          This file. The instructions, for every harness.
   commands/        Named workflows you invoke explicitly.
   agents/          Subagent definitions for delegated work.
   hooks/           Executable guards; the harness decides when to run them.
+  plugins/         Vendored Claude Code plugins, wired up in .claude/settings.json.
 CLAUDE.md          Claude Code adapter → imports AGENTS.md.
 .claude/           Claude Code adapter → symlinks into .agents/, plus settings.json.
 ```

@@ -157,6 +157,22 @@
     ]
   },
   "enabledPlugins": {
-    "mattpocock-skills@claude-plugins-official": false
+    "mattpocock-skills@claude-plugins-official": false,
+    "codex@openai-codex": true,
+    "claudex-loop@claudex-loop": true
+  },
+  "extraKnownMarketplaces": {
+    "openai-codex": {
+      "source": {
+        "source": "directory",
+        "path": "./.agents/plugins/codex"
+      }
+    },
+    "claudex-loop": {
+      "source": {
+        "source": "directory",
+        "path": "./.agents/plugins/claudex-loop"
+      }
+    }
   }
 }
