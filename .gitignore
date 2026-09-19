@@ -27,3 +27,6 @@ Thumbs.db
 .graphify/
 graphify-out/
 .claude/settings.json.graphify-bak
+
+# claude plugin eval writes run output here
+.agents/skills/*/evals/results/

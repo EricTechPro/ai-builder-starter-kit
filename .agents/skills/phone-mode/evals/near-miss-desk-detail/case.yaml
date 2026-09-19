@@ -1,0 +1,37 @@
+schema_version: "1.1"
+name: near-miss-desk-detail
+description: >
+  An explicit request for depth. The skill's whole job is compressing replies, so this
+  is the request it must not touch. Tests the exit condition as much as the trigger.
+tags: [triggering, near-miss]
+runs: 2
+plugins: ["../.."]
+
+execution:
+  prompt: |
+    give me the long version: walk me through exactly how guard-secrets.sh decides
+    what to block, regex by regex
+  max_turns: 20
+  allowed_tools: [Read, Glob, Grep, Skill]
+
+graders:
+  - name: skill-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: phone-mode
+    min: 0
+    max: 0
+    arm: both
+    weight: 3
+
+  - name: actually-detailed
+    type: llm
+    focus: last_message
+    weight: 2
+    criteria: |
+      PASS if the reply gives real depth: it walks through the matching rules one at a
+      time rather than summarising them, and is longer than a phone card would allow.
+
+      FAIL if it is compressed into emoji-header bullets, capped near 15 lines, or ends
+      with a 👉 and one decision. "Give me the long version" is the documented phrase
+      for leaving phone mode, so honouring it is the point of this case.

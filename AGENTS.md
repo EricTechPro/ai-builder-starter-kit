@@ -25,6 +25,17 @@ CLAUDE.md          Claude Code adapter → imports AGENTS.md.
 Nothing is duplicated between `.agents/` and `.claude/`: the latter is symlinks and one
 settings file. Adding a harness means adding an adapter, not a second copy of the content.
 
+**Installing anything new — a skill, a command, a subagent — puts it in `.agents/`, never in
+`.claude/`.** Writing to `.claude/skills/foo` happens to work, because that path is a symlink
+and resolves to `.agents/skills/foo`, but write to the real path so the source of truth stays
+obvious to the next reader.
+
+Never replace one of those symlinks with a real directory. That is how the tree forks in
+silence: two copies of a skill, edits landing in whichever one you opened. `.agents/hooks/session-context.sh`
+checks this at every session start and says so if it happens. If an installer insists on
+creating a real `.claude/skills/`, move its contents into `.agents/skills/` and restore the
+link with `ln -s ../.agents/skills .claude/skills`.
+
 ## Commands
 
 <!-- The exact invocation, including the package manager. Agents run these verbatim. -->
