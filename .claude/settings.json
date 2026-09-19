@@ -69,6 +69,26 @@
             "timeout": 10
           }
         ]
+      },
+      {
+        "matcher": "Bash|Grep",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"${CLAUDE_PROJECT_DIR:-.}/.agents/bin/graphify\" hook-guard search",
+            "timeout": 10
+          }
+        ]
+      },
+      {
+        "matcher": "Read|Glob",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"${CLAUDE_PROJECT_DIR:-.}/.agents/bin/graphify\" hook-guard read",
+            "timeout": 10
+          }
+        ]
       }
     ],
     "SessionStart": [

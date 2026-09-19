@@ -1,0 +1,25 @@
+#!/bin/sh
+# Repo-local graphify launcher.
+#
+# graphify is installed into this repository's own venv (.graphify/), not into
+# your user profile, so every checkout runs the same version and no global
+# `uv tool install` is required. Everything that needs the CLI -- the PreToolUse
+# hooks in .claude/settings.json and the graphify skill -- goes through here.
+#
+# Recreate the venv after a fresh clone with:
+#   uv venv .graphify --python 3.12 && uv pip install --python .graphify/bin/python graphifyy
+set -e
+
+root=${CLAUDE_PROJECT_DIR:-}
+if [ -z "$root" ]; then
+    root=$(CDPATH= cd -- "$(dirname -- "$0")/../.." && pwd)
+fi
+bin="$root/.graphify/bin/graphify"
+
+if [ ! -x "$bin" ]; then
+    echo "graphify is not installed in this repo." >&2
+    echo "Run: uv venv .graphify --python 3.12 && uv pip install --python .graphify/bin/python graphifyy" >&2
+    exit 127
+fi
+
+exec "$bin" "$@"
