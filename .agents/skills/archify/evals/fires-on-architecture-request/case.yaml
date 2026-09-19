@@ -1,0 +1,49 @@
+schema_version: "1.1"
+name: fires-on-architecture-request
+description: >
+  The plainest trigger: someone describing a system in prose and asking to see it.
+  No mention of the skill, no mention of diagrams-as-HTML. If this does not fire,
+  the skill is dead weight.
+tags: [triggering, architecture]
+runs: 2
+plugins: ["../.."]
+
+execution:
+  prompt: |
+    draw me a picture of how our stack fits together: a Next.js frontend on Vercel
+    talks to a Node API, the API reads and writes Postgres and caches reads in Redis,
+    and a worker pulls jobs off SQS and writes back to the same Postgres.
+  max_turns: 40
+  allowed_tools: [Read, Glob, Grep, Write, Bash, Skill]
+
+graders:
+  - name: skill-fired
+    type: tool_used
+    tool: Skill
+    input_match: archify
+    arm: with-only
+    weight: 3
+
+  - name: validated-before-handoff
+    type: llm
+    focus: trace
+    weight: 3
+    criteria: |
+      PASS if the assistant ran `bin/archify.mjs` with `validate` or `deliver` against a
+      JSON candidate it authored, and the run it reported as final exited successfully.
+
+      FAIL if it hand-wrote HTML or SVG without going through the archify CLI, if it
+      described a failing or non-zero run as success, or if it edited the candidate after
+      its final passing validation.
+
+  - name: topology-is-faithful
+    type: llm
+    focus: trace
+    weight: 2
+    criteria: |
+      PASS if the JSON it authored contains nodes for the frontend, the API, Postgres,
+      Redis, the worker and the queue, with the API connected to both Postgres and Redis
+      and the worker connected to both the queue and Postgres.
+
+      FAIL if it invented components the user never mentioned, dropped one of the six, or
+      wired the worker directly to the frontend or API.

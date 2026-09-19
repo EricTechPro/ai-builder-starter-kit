@@ -1,0 +1,38 @@
+schema_version: "1.1"
+name: near-miss-statistical-chart
+description: >
+  A chart of numbers, not a map of a system. Archify draws topology — architecture,
+  workflow, sequence, dataflow, lifecycle — and has no bar chart in it. The word
+  "visualize" plus the word "data" is exactly the overlap that makes it misfire, and
+  this repo already has `dataviz` for the real job.
+tags: [triggering, near-miss]
+runs: 2
+plugins: ["../.."]
+
+execution:
+  prompt: |
+    can you visualize this data for me? quarterly revenue, I want to see the trend:
+    Q1 412000, Q2 389000, Q3 501000, Q4 628000
+  max_turns: 30
+  allowed_tools: [Read, Glob, Grep, Write, Bash, Skill]
+
+graders:
+  - name: skill-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: archify
+    min: 0
+    max: 0
+    arm: both
+    weight: 3
+
+  - name: answered-the-actual-question
+    type: llm
+    focus: trace
+    weight: 2
+    criteria: |
+      PASS if the assistant produced or offered a chart of the four quarterly values — a
+      bar or line chart showing the trend.
+
+      FAIL if it tried to express revenue figures as an architecture, workflow, dataflow or
+      lifecycle diagram, or if it invented a data pipeline that was never described.

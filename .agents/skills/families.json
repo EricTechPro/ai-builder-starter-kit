@@ -48,6 +48,14 @@
       "skills": [
         "graphify"
       ]
+    },
+    {
+      "name": "Archify",
+      "source": "https://github.com/tt-a1i/archify",
+      "description": "Validated architecture, workflow, sequence, data-flow, and lifecycle diagrams as standalone HTML.",
+      "skills": [
+        "archify"
+      ]
     }
   ]
 }

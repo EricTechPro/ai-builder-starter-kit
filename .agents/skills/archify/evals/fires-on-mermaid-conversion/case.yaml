@@ -1,0 +1,56 @@
+schema_version: "1.1"
+name: fires-on-mermaid-conversion
+description: >
+  Pasted Mermaid with a "make this look better" ask. This is the second half of the
+  skill's description and the path most likely to be answered by just editing the
+  Mermaid in place, which is the failure this case exists to catch.
+tags: [triggering, mermaid]
+runs: 2
+plugins: ["../.."]
+
+execution:
+  prompt: |
+    this renders but it's ugly, can you make it look good?
+
+    ```mermaid
+    sequenceDiagram
+      Browser->>API: POST /checkout
+      API->>Stripe: create PaymentIntent
+      Stripe-->>API: client_secret
+      API-->>Browser: client_secret
+      Browser->>Stripe: confirmCardPayment
+      Stripe-->>API: webhook payment_intent.succeeded
+      API->>DB: mark order paid
+    ```
+  max_turns: 40
+  allowed_tools: [Read, Glob, Grep, Write, Bash, Skill]
+
+graders:
+  - name: skill-fired
+    type: tool_used
+    tool: Skill
+    input_match: archify
+    arm: with-only
+    weight: 3
+
+  - name: produced-a-real-artifact
+    type: llm
+    focus: trace
+    weight: 3
+    criteria: |
+      PASS if the assistant converted the Mermaid into an archify `sequence` JSON candidate
+      and ran it through `bin/archify.mjs`, ending with a successful run.
+
+      FAIL if it only restyled or reformatted the Mermaid source, suggested a Mermaid theme
+      or config block, or returned prose about how to make it prettier.
+
+  - name: steps-survived-conversion
+    type: llm
+    focus: trace
+    weight: 2
+    criteria: |
+      PASS if all seven interactions survive in order, including the Stripe webhook back to
+      the API and the final write marking the order paid.
+
+      FAIL if it dropped the webhook, collapsed the two Stripe round-trips into one, or
+      reordered the confirmation ahead of the client_secret return.
