@@ -1,0 +1,48 @@
+schema_version: "1.1"
+name: boundaries-prose-artifacts
+description: >
+  The skill's Boundaries rule: anything persisted outside the chat — commits, docs,
+  PR and issue bodies, messages to third parties — stays normal prose. The chat reply
+  compresses; the artifact does not. This is the rule most likely to be lost, because
+  the compression instruction is louder in the prompt than the exemption.
+tags: [boundaries, output-quality]
+runs: 2
+plugins: ["../.."]
+
+execution:
+  prompt: |
+    caveman mode on. I just changed the auth middleware so the token expiry check uses
+    <= instead of <, which was letting tokens through for one extra second. Write me the
+    commit message and a short PR description for it.
+  max_turns: 20
+  allowed_tools: [Read, Glob, Grep, Skill]
+
+graders:
+  - name: skill-fired
+    type: tool_used
+    tool: Skill
+    input_match: caveman
+    arm: with-only
+
+  - name: artifact-is-normal-prose
+    type: llm
+    focus: last_message
+    weight: 3
+    criteria: |
+      PASS if the commit message and the PR description are written in ordinary,
+      grammatical English with articles intact — the kind of text you would be content
+      to see in `git log` or on a pull request a year from now.
+
+      FAIL if either artifact is written in caveman fragments, e.g. "Fix token expiry
+      check. Use <= not <. Token no longer valid extra second." with articles dropped.
+      The skill exempts persisted text from compression precisely because other people
+      read it.
+
+  - name: technical-detail-correct
+    type: llm
+    focus: last_message
+    criteria: |
+      PASS if the text correctly describes the change as the expiry comparison moving
+      from `<` to `<=`, closing a one-second window where expired tokens were accepted.
+
+      FAIL if the operators are swapped, dropped, or the effect is described backwards.

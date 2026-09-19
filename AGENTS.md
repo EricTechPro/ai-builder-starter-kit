@@ -30,6 +30,15 @@ settings file. Adding a harness means adding an adapter, not a second copy of th
 and resolves to `.agents/skills/foo`, but write to the real path so the source of truth stays
 obvious to the next reader.
 
+A new skill also needs an eval under its `evals/`. The existing eval gate enforces this.
+The README skill-family table and skill counts are generated. After changing skills or
+provenance, run `python3 .agents/scripts/sync_skill_readme.py`. Counts come from installed
+`SKILL.md` files; family attribution comes from `UPSTREAM.md` and
+`.agents/skills/families.json`. Edit family metadata for names and short descriptions,
+never the generated table. New skills without provenance appear under Local Skills.
+See [.agents/hooks/README-skills.md](.agents/hooks/README-skills.md) for the portable Git
+hook and live watcher. Focused check: `python3 -m unittest discover -s .agents/scripts/tests`.
+
 Never replace one of those symlinks with a real directory. That is how the tree forks in
 silence: two copies of a skill, edits landing in whichever one you opened. `.agents/hooks/session-context.sh`
 checks this at every session start and says so if it happens. If an installer insists on

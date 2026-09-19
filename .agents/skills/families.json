@@ -1,0 +1,53 @@
+{
+  "families": [
+    {
+      "name": "Matt Pocock’s Skills",
+      "source": "https://github.com/mattpocock/skills",
+      "description": "Planning, development, testing, debugging, architecture, research, and code review.",
+      "skills": [
+        "ask-matt",
+        "code-review",
+        "codebase-design",
+        "diagnosing-bugs",
+        "domain-modeling",
+        "grill-me",
+        "grill-with-docs",
+        "grilling",
+        "handoff",
+        "implement",
+        "improve-codebase-architecture",
+        "prototype",
+        "research",
+        "resolving-merge-conflicts",
+        "setup-matt-pocock-skills",
+        "tdd",
+        "teach",
+        "to-questionnaire",
+        "to-spec",
+        "to-tickets",
+        "triage",
+        "wait-what",
+        "wayfinder",
+        "wizard",
+        "writing-for-agents"
+      ]
+    },
+    {
+      "name": "Eric Tech’s Skills",
+      "source": "https://github.com/EricTechPro/erictech-skills",
+      "link": false,
+      "description": "Custom skills created and curated by Eric Tech.",
+      "skills": [
+        "phone-mode"
+      ]
+    },
+    {
+      "name": "Graphify",
+      "source": "https://github.com/Graphify-Labs/graphify",
+      "description": "Build and query knowledge graphs of code, documentation, and project content.",
+      "skills": [
+        "graphify"
+      ]
+    }
+  ]
+}
