@@ -155,3 +155,52 @@ class IntegrationTests(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
+
+
+class EvalColumnTests(unittest.TestCase):
+    """The Eval column is the only thing in the README that says why a skill is
+    here. A family with no measurement has to read as "no measurement", never as
+    a blank that looks like a passing grade."""
+
+    def setUp(self):
+        spec = importlib.util.spec_from_file_location('sync', SCRIPT)
+        self.module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(self.module)
+        self.temp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.temp.cleanup)
+        self.root = pathlib.Path(self.temp.name)
+        (self.root / '.agents/skills/demo').mkdir(parents=True)
+        (self.root / '.agents/skills/demo/SKILL.md').write_text('---\nname: demo\n---\n')
+        (self.root / '.agents/skills/UPSTREAM.md').write_text('')
+        (self.root / 'README.md').write_text(
+            'A skills pack for coding agents: **9 skills,** x\n'
+            '<!-- skills:start -->\nold\n<!-- skills:end -->\n')
+
+    def families(self, text):
+        (self.root / '.agents/skills/families.json').write_text(text)
+
+    def test_family_with_an_eval_links_into_the_ledger(self):
+        self.families('{"families": [{"name": "Demo", "description": "d",'
+                      ' "skills": ["demo"],'
+                      ' "eval": {"verdict": "Kept, +0.40", "anchor": "demo-vs-other"}}]}')
+        self.module.sync(self.root)
+        self.assertIn('[Kept, +0.40](.agents/skills/EVALS.md#demo-vs-other)',
+                      (self.root / 'README.md').read_text())
+
+    def test_family_without_an_eval_says_so(self):
+        self.families('{"families": [{"name": "Demo", "description": "d", "skills": ["demo"]}]}')
+        self.module.sync(self.root)
+        self.assertIn('| Demo | 1 | d | \u2014 |', (self.root / 'README.md').read_text())
+
+    def test_anchor_must_be_a_slug(self):
+        self.families('{"families": [{"name": "Demo", "description": "d", "skills": ["demo"],'
+                      ' "eval": {"verdict": "Kept", "anchor": "Not A Slug"}}]}')
+        with self.assertRaises(ValueError):
+            self.module.sync(self.root)
+        self.assertIn('old', (self.root / 'README.md').read_text())
+
+    def test_skill_count_survives_the_extra_column(self):
+        self.families('{"families": [{"name": "Demo", "description": "d", "skills": ["demo"],'
+                      ' "eval": {"verdict": "Kept", "anchor": "demo"}}]}')
+        self.module.sync(self.root)
+        self.assertIn('**1 skills,**', (self.root / 'README.md').read_text())

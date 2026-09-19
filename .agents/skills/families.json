@@ -30,7 +30,11 @@
         "wayfinder",
         "wizard",
         "writing-for-agents"
-      ]
+      ],
+      "eval": {
+        "verdict": "Kept over obra/superpowers",
+        "anchor": "diagnosing-bugs-vs-systematic-debugging"
+      }
     },
     {
       "name": "Eric Tech’s Skills",
@@ -39,7 +43,11 @@
       "description": "Custom skills created and curated by Eric Tech.",
       "skills": [
         "phone-mode"
-      ]
+      ],
+      "eval": {
+        "verdict": "Kept, over-fires",
+        "anchor": "phone-mode"
+      }
     },
     {
       "name": "Graphify",
@@ -55,7 +63,11 @@
       "description": "Validated architecture, workflow, sequence, data-flow, and lifecycle diagrams as standalone HTML.",
       "skills": [
         "archify"
-      ]
+      ],
+      "eval": {
+        "verdict": "0.30, undecided",
+        "anchor": "archify"
+      }
     },
     {
       "name": "agent-browser",
@@ -72,6 +84,18 @@
       "skills": [
         "playwright-best-practices"
       ]
+    },
+    {
+      "name": "juliusbrussee/caveman",
+      "source": "https://github.com/juliusbrussee/caveman",
+      "description": "Token compression with an auto-clarity layer that suspends it for irreversible steps.",
+      "skills": [
+        "caveman"
+      ],
+      "eval": {
+        "verdict": "Kept, +0.40 on safety",
+        "anchor": "caveman"
+      }
     }
   ]
 }

@@ -983,12 +983,15 @@ def main():
         sys.exit("duplicate case names: %s" % names)
 
     rendered = {c["name"]: render(c) for c in CASES}
-    drift = []
+    drift, missing = [], []
 
     for skill in SKILLS:
         base = ROOT / ".agents" / "skills" / skill / "evals"
         if not (base.parent / "SKILL.md").exists():
-            sys.exit("no such skill: %s" % skill)
+            # The challenger was dropped after the bakeoff. Re-vendor it and this
+            # comes back on its own rather than needing an edit here.
+            missing.append(skill)
+            continue
         for name, text in rendered.items():
             wants_fixture = SCAFFOLDED[name]
             files = {"case.yaml": text}
@@ -1017,6 +1020,8 @@ def main():
                     stray.unlink()
                     stray.parent.rmdir()
 
+    for skill in missing:
+        print("not installed, skipped: %s" % skill)
     if args.check:
         if drift:
             print("out of date, re-run without --check:")
@@ -1027,7 +1032,7 @@ def main():
         return 0
 
     digests = {}
-    for skill in SKILLS:
+    for skill in [s for s in SKILLS if s not in missing]:
         base = ROOT / ".agents" / "skills" / skill / "evals"
         h = hashlib.sha256()
         for name in sorted(rendered):
@@ -1039,6 +1044,8 @@ def main():
     print("wrote %d cases to each of: %s" % (len(CASES), ", ".join(SKILLS)))
     for skill, digest in digests.items():
         print("  %-24s %s" % (skill, digest))
+    if len(digests) < 2:
+        return 0
     if len(set(digests.values())) != 1:
         return 1
     print("suites are byte-identical; any score gap is the skill, not the cases")

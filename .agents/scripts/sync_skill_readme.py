@@ -14,6 +14,7 @@ START = '<!-- skills:start -->'
 END = '<!-- skills:end -->'
 CONFIG = '.agents/skills/families.json'
 PROVENANCE = '.agents/skills/UPSTREAM.md'
+EVALS = '.agents/skills/EVALS.md'
 
 
 def git(root, *args):
@@ -32,6 +33,17 @@ def inventory(root, staged=False):
     if not directory.is_dir():
         raise ValueError('Missing .agents/skills directory')
     return sorted(p.name for p in directory.iterdir() if p.is_dir() and (p / 'SKILL.md').is_file())
+
+
+def verdict(family):
+    """Eval cell for a family: a link into EVALS.md, or an explicit blank."""
+    entry = family.get('eval')
+    if not entry:
+        return '—'
+    anchor = cell(entry['anchor'])
+    if not re.fullmatch(r'[a-z0-9-]+', anchor):
+        raise ValueError('Family eval anchors must be lowercase-hyphen slugs: ' + anchor)
+    return '[' + cell(entry['verdict']) + '](' + EVALS + '#' + anchor + ')'
 
 
 def cell(value):
@@ -74,7 +86,7 @@ def table(root, staged=False):
     counts = {id(f): 0 for f in families}
     for skill in inventory(root, staged):
         counts[id(by_skill.get(skill, local))] += 1
-    lines = ['| Skill Family | # Skills | Description Short Brief (max 15 words) |', '|---|---:|---|']
+    lines = ['| Skill Family | # Skills | Description Short Brief (max 15 words) | Eval |', '|---|---:|---|---|']
     for family in families:
         count = counts[id(family)]
         if not count:
@@ -82,7 +94,7 @@ def table(root, staged=False):
         name = family['name']
         if family.get('source') and family.get('link', True):
             name = '[' + name + '](' + family['source'] + ')'
-        lines.append(f"| {name} | {count} | {family['description']} |")
+        lines.append(f"| {name} | {count} | {family['description']} | {verdict(family)} |")
     return '\n'.join(lines)
 
 

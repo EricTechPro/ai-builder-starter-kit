@@ -1,8 +1,8 @@
 # ai-builder-starter-kit
 
-A skills pack for coding agents: **30 skills, 3 commands, 5 guards.** Python 3 is required for README sync.
+A skills pack for coding agents: **29 skills, 3 commands, 5 guards.** Python 3 is required for README sync.
 
-![Skills](https://img.shields.io/badge/skills-30-000000?style=flat-square)
+![Skills](https://img.shields.io/badge/skills-29-000000?style=flat-square)
 ![Commands](https://img.shields.io/badge/commands-3-000000?style=flat-square)
 ![Guards](https://img.shields.io/badge/guards-5-000000?style=flat-square)
 ![Runtime](https://img.shields.io/badge/runtime-Python%203.9%2B-000000?style=flat-square)
@@ -24,14 +24,13 @@ Claude Code reads `.claude/` (three symlinks into `.agents/`). Codex reads `.age
 ## Skills
 
 <!-- skills:start -->
-| Skill Family | # Skills | Description Short Brief (max 15 words) |
-|---|---:|---|
-| [Matt Pocock’s Skills](https://github.com/mattpocock/skills) | 25 | Planning, development, testing, debugging, architecture, research, and code review. |
-| Eric Tech’s Skills | 1 | Custom skills created and curated by Eric Tech. |
-| [Graphify](https://github.com/Graphify-Labs/graphify) | 1 | Build and query knowledge graphs of code, documentation, and project content. |
-| [Archify](https://github.com/tt-a1i/archify) | 1 | Validated architecture, workflow, sequence, data-flow, and lifecycle diagrams as standalone HTML. |
-| [juliusbrussee/caveman](https://github.com/juliusbrussee/caveman) | 1 | Additional skills from this upstream project. |
-| [obra/superpowers](https://github.com/obra/superpowers) | 1 | Additional skills from this upstream project. |
+| Skill Family | # Skills | Description Short Brief (max 15 words) | Eval |
+|---|---:|---|---|
+| [Matt Pocock’s Skills](https://github.com/mattpocock/skills) | 25 | Planning, development, testing, debugging, architecture, research, and code review. | [Kept over obra/superpowers](.agents/skills/EVALS.md#diagnosing-bugs-vs-systematic-debugging) |
+| Eric Tech’s Skills | 1 | Custom skills created and curated by Eric Tech. | [Kept, over-fires](.agents/skills/EVALS.md#phone-mode) |
+| [Graphify](https://github.com/Graphify-Labs/graphify) | 1 | Build and query knowledge graphs of code, documentation, and project content. | — |
+| [Archify](https://github.com/tt-a1i/archify) | 1 | Validated architecture, workflow, sequence, data-flow, and lifecycle diagrams as standalone HTML. | [0.30, undecided](.agents/skills/EVALS.md#archify) |
+| [juliusbrussee/caveman](https://github.com/juliusbrussee/caveman) | 1 | Token compression with an auto-clarity layer that suspends it for irreversible steps. | [Kept, +0.40 on safety](.agents/skills/EVALS.md#caveman) |
 <!-- skills:end -->
 
 Vendored as copies, not plugins — they travel with the repo and you can edit them.
